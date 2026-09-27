@@ -4,6 +4,8 @@
 
 For SSH requests here, use the live AgentsWeb Actions runner and `~/.ssh/aiplay-agentsweb`; use `a2` only if named. Ask before starting a runner. Verify SSH before editing runner YAML.
 
+In debug mode, SSH into the live Actions worker and inspect OpenCode records, logs, and processes. Report verified results without waiting for the 30-minute idle hold or Actions completion.
+
 ## OpenCode smoke command
 
 Run `opencode run -m opencode/muse-spark-1.3-contributor-free hi` to verify the Muse Spark 1.3 model.
