@@ -21,4 +21,12 @@ Use the 2026-09-27 real OpenCode 1.18.31 run on the existing Actions SSH worker 
 - Include Cyberpunk with an empty source field in the shared root catalog.
 - Reject Wikipedia as a non-game without creating a catalog page.
 
-Inspect `work/beta-e2e-evidence/initial-summary.json` for the first-run validation failures and retained original Arena report. Keep the real issue-trigger, PR/comment, owner-hold, and non-owner-limit checks pending until new beta Actions runners are approved and exercised. Do not treat the catalog CLI run as verification of GitHub orchestration.
+Inspect `work/beta-e2e-evidence/initial-summary.json` for the first-run validation failures and retained original Arena report. Distinguish these CLI checks from the issue-driven verification below.
+
+## Inspect the real issue-driven beta run
+
+Inspect [beta issue #1](https://github.com/agents-dev/Astra-Top-Games-beta/issues/1), [run 36296805681](https://github.com/agents-dev/Astra-Top-Games-beta/actions/runs/36296805681), [PR #2](https://github.com/agents-dev/Astra-Top-Games-beta/pull/2), and the [per-game results comment](https://github.com/agents-dev/Astra-Top-Games-beta/issues/1#issuecomment-5852961492) for the successful 2026-09-27 issue-triggered check. Use the five randomly sampled game links from the supplied `games.json` as the input evidence. Read the saved sample and issue payload in `work/beta-e2e-evidence/`.
+
+Verify all five reported additions: omg-test, Trashketball — Out of Office, Beat Streets — Web, OxCity, and HELLAS. Inspect `catalog-reports-1` and `catalog-records-1` for the transferred reports and completed OpenCode records. Confirm the publisher completed and linked the review PR while the owner analysis worker remained reachable by SSH on port 32681 with its hold process active. Leave the PR unmerged and avoid waiting for the idle hold to complete.
+
+Keep non-owner limits, non-owner hold omission, owner batches above ten links, and issue-body edit triggering as unverified orchestration cases. Use the earlier CLI evidence for replacement, no-source acceptance, and rejection; do not claim these were exercised by this all-qualifying five-link issue.
