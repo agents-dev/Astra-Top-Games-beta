@@ -82,7 +82,7 @@ def destination(data, submitted):
             continue
         try:
             old = json.loads(path.read_text())
-            if (repo and old.get('repository_url', '').lower() == repo.lower()) or submitted in old.get('links', []):
+            if (repo and old.get('repository_url', '').casefold() == repo.casefold()) or old.get('repository_url', '').casefold() == submitted.casefold() or submitted in old.get('links', []):
                 return path.parent
         except (ValueError, OSError):
             continue
@@ -92,8 +92,14 @@ def destination(data, submitted):
 
 
 def checked_report(data, submitted):
-    validate(data, submitted if urlsplit(submitted).hostname == 'github.com' else None)
-    data = dict(data)
+    # Normalize observed spelling variants, then enforce the stored schema.
+    if isinstance(data, dict):
+        data = dict(data)
+        modes = data.get('player_modes')
+        if isinstance(modes, dict) and isinstance(modes.get('modes'), list):
+            aliases = {'local-multiplayer': 'local multiplayer', 'online-multiplayer': 'online multiplayer'}
+            data['player_modes'] = {**modes, 'modes': [aliases.get(mode, mode) if isinstance(mode, str) else mode for mode in modes['modes']]}
+    validate(data)
     data['links'] = list(dict.fromkeys([submitted] + [u for u in data['links'] if safe_url(u)]))
     return data
 

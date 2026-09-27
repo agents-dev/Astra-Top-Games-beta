@@ -141,7 +141,9 @@ def publish():
                     status = 'replacement_failed' if replaced else item.get('status', 'failed')
                     statuses.append({'url': url, 'status': status, 'reason': reason})
             except (ValueError, OSError, KeyError, TypeError) as exc:
-                statuses.append({'url': url, 'status': 'failed', 'reason': str(exc)[:2000]})
+                existing = games.destination({'repository_url': ''}, url)
+                status = 'replacement_failed' if (existing / 'readme.json').exists() else 'failed'
+                statuses.append({'url': url, 'status': status, 'reason': str(exc)[:2000]})
         games.rebuild()
         git('add', '--', 'games', 'README.md')
         if git('diff', '--cached', '--name-only'):
