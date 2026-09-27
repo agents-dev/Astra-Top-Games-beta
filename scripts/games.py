@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
-"""Analyze new GitHub games, then rebuild the game catalog."""
+"""Analyze public game links, replace matching reports, and rebuild one shared catalog."""
 
 import argparse
 import concurrent.futures
 from datetime import datetime, timezone
 import fcntl
 import html
+import hashlib
+import ipaddress
 import json
 import os
 from pathlib import Path
@@ -52,6 +54,69 @@ def game_url(value):
     return normalized, directory
 
 
+def input_url(value):
+    parsed = urlsplit(value.strip())
+    if parsed.scheme not in ('http', 'https') or not parsed.hostname or parsed.username or parsed.password:
+        raise ValueError('Require a public HTTP(S) URL without credentials')
+    host = parsed.hostname.lower()
+    if host == 'localhost' or host.endswith(('.localhost', '.local', '.internal')) or '.' not in host:
+        raise ValueError('Require a public host')
+    try:
+        address = ipaddress.ip_address(host)
+    except ValueError:
+        pass
+    else:
+        if not address.is_global:
+            raise ValueError('Require a public address')
+    if parsed.port not in (None, 80, 443):
+        raise ValueError('Require a standard HTTP(S) port')
+    if host == 'github.com':
+        return game_url(value)[0]
+    return parsed._replace(fragment='', netloc=host if parsed.port is None else parsed.netloc).geturl()
+
+
+def destination(data, submitted):
+    repo = data.get('repository_url', '')
+    for path in sorted(GAMES.rglob('readme.json')) if GAMES.exists() else []:
+        if path.is_symlink() or any(parent.is_symlink() for parent in path.parents):
+            continue
+        try:
+            old = json.loads(path.read_text())
+            if (repo and old.get('repository_url', '').lower() == repo.lower()) or submitted in old.get('links', []):
+                return path.parent
+        except (ValueError, OSError):
+            continue
+    if repo:
+        return game_url(repo)[1]
+    return GAMES / ('web--' + hashlib.sha256(submitted.encode()).hexdigest()[:20])
+
+
+def checked_report(data, submitted):
+    validate(data, submitted if urlsplit(submitted).hostname == 'github.com' else None)
+    data = dict(data)
+    data['links'] = list(dict.fromkeys([submitted] + [u for u in data['links'] if safe_url(u)]))
+    return data
+
+
+def publish_report(data, submitted, metadata=None):
+    data = checked_report(data, submitted)
+    directory = destination(data, submitted)
+    if any(p.is_symlink() for p in [directory, *directory.parents]):
+        raise ValueError('Refuse symlink catalog destination')
+    status = 'replaced' if (directory / 'readme.json').exists() else 'added'
+    rendered = game_readme(data)
+    write_atomic(directory / 'readme.json', json.dumps(data, indent=2, ensure_ascii=False) + '\n')
+    write_atomic(directory / 'README.md', rendered)
+    record = {'added_at': datetime.now(timezone.utc).isoformat(), 'source_url': submitted,
+              'output': str(directory.relative_to(ROOT)), 'status': status, 'title': data['title'],
+              'rating_score': data['rating']['score'],
+              'screenshot_based_score': None if data['screenshot_based_score'] is None else data['screenshot_based_score']['score']}
+    record.update(metadata or {})
+    with (GAMES / 'added.jsonl').open('a', encoding='utf-8') as ledger:
+        ledger.write(json.dumps(record, ensure_ascii=False) + '\n')
+    return record
+
+
 def markdown(value):
     return re.sub(r'([\\`*_{}\[\]<>|])', r'\\\1', str(value).replace('\n', ' '))
 
@@ -80,7 +145,9 @@ def validate(data, expected_url=None):
     if not isinstance(data, dict):
         raise ValueError('Report must be a JSON object')
     url = data.get('repository_url')
-    normalized, _ = game_url(url) if isinstance(url, str) else (None, None)
+    if not isinstance(url, str):
+        raise ValueError('repository_url must be a GitHub URL or an empty string')
+    normalized = game_url(url)[0] if url else ''
     if expected_url and normalized != expected_url:
         raise ValueError(f'Report URL does not match input: {url}')
     if not isinstance(data.get('title'), str) or not data['title'].strip():
@@ -133,7 +200,7 @@ def game_readme(data):
     url = safe_url(data['repository_url'])
     graphic = data['screenshot_based_score']
     graphic_text = 'not scored' if graphic is None else f"{graphic['score']}/100"
-    out = [f'# {title}', '', f'[Open the game source]({url})']
+    out = [f'# {title}', '', f'[Open the game source]({url})' if url else 'GitHub source unavailable. Inspect the original links below.']
     if data.get('play_game_url'):
         out.append(f"[Play the game]({safe_url(data['play_game_url'])})")
     out += ['',
@@ -200,16 +267,15 @@ def rebuild():
     for path in sorted(GAMES.rglob('readme.json')) if GAMES.exists() else []:
         try:
             data = validate(json.loads(path.read_text(encoding='utf-8')))
-            _, expected = game_url(data['repository_url'])
-            if path.parent != expected:
-                raise ValueError(f'Report belongs at {expected}')
+            if path.is_symlink() or any(parent.is_symlink() for parent in path.parents):
+                raise ValueError('Refuse symlink report')
             write_atomic(path.with_name('README.md'), game_readme(data))
             entries.append((path.parent, data))
         except (OSError, ValueError, json.JSONDecodeError) as exc:
             log(f'Skip {path}: {exc}')
     entries.sort(key=lambda item: (-item[1]['rating']['score'], item[1]['title'].casefold(), str(item[0])))
     out = ['# Game catalog', '', 'Browse the rated games. Open each game page for evidence and play instructions.', '',
-           'Add games with `./scripts/games.sh <github-game-url> [more-urls...]` or '
+           'Add games with `./scripts/games.sh <game-url> [more-urls...]` or '
            '`./scripts/games.sh --file links.txt`. Rebuild every page and this index with '
            '`./scripts/games.sh`. Inspect `games/added.jsonl` for dated additions. '
            'Inspect `work/game-batches/` for agent logs and rejected reports.', '', '## Games', '']
@@ -256,13 +322,8 @@ def inputs(args):
     if args.file:
         values += [line.strip() for line in args.file.read_text(encoding='utf-8').splitlines()
                    if line.strip() and not line.lstrip().startswith('#')]
-    unique = {}
-    for value in values:
-        url, directory = game_url(value)
-        if directory in unique and unique[directory] != url:
-            raise ValueError(f'Two links target the same game location: {directory}')
-        unique[directory] = url
-    return [(url, directory) for directory, url in unique.items()]
+    urls = list(dict.fromkeys(input_url(value) for value in values))
+    return [(url, None) for url in urls]
 
 
 def analyze(items, args):
@@ -290,27 +351,31 @@ def analyze(items, args):
                            for _, _, meta in prepared]
                 for (url, directory, meta), future in zip(prepared, futures):
                     result = future.result()
-                    if result['status'] != 'finished':
-                        log(f"Skip {url}: agent {result['status']}; inspect {meta / 'result.json'}")
-                        continue
-                    report = Path(result['directory']) / 'readme.json'
+                    item = {'url': url, 'status': 'failed', 'reason': ''}
                     try:
-                        data = validate(json.loads(report.read_text(encoding='utf-8')), url)
-                        directory.mkdir(parents=True, exist_ok=True)
-                        write_atomic(directory / 'readme.json', json.dumps(data, indent=2, ensure_ascii=False) + '\n')
-                        write_atomic(directory / 'README.md', game_readme(data))
-                        record = {'added_at': datetime.now(timezone.utc).isoformat(),
-                                  'source_url': url, 'output': str(directory.relative_to(ROOT)),
-                                  'title': data['title'], 'rating_score': data['rating']['score'],
-                                  'screenshot_based_score': None if data['screenshot_based_score'] is None
-                                  else data['screenshot_based_score']['score'],
-                                  'session_id': result['session_id'], 'model': args.model,
-                                  'prompt_sha256': result['prompt_sha256']}
-                        with (GAMES / 'added.jsonl').open('a', encoding='utf-8') as ledger:
-                            ledger.write(json.dumps(record, ensure_ascii=False) + '\n')
-                        print(f"Added {data['title']}: {directory.relative_to(ROOT)}", flush=True)
-                    except (OSError, ValueError, json.JSONDecodeError) as exc:
-                        log(f'Skip {url}: cannot publish readme.json: {exc}; inspect {report}')
+                        if result['status'] != 'finished':
+                            raise ValueError(f"Agent {result['status']} (exit {result.get('exit_code')})")
+                        report = Path(result['directory']) / 'readme.json'
+                        if report.stat().st_size > 1024 * 1024:
+                            raise ValueError('Report exceeds 1 MiB')
+                        raw = json.loads(report.read_text(encoding='utf-8'))
+                        if isinstance(raw, dict) and raw.get('rejected') in ('not_game', 'inaccessible'):
+                            item.update(status=raw['rejected'], reason=str(raw.get('reason', 'No reason supplied'))[:2000])
+                        else:
+                            data = checked_report(raw, url)
+                            item.update(status='ready', report=data)
+                            if not args.defer_publish:
+                                record = publish_report(data, url, {'session_id': result['session_id'],
+                                    'model': args.model, 'prompt_sha256': result['prompt_sha256']})
+                                item.update(status=record['status'], output=record['output'])
+                                print(f"{record['status'].capitalize()} {data['title']}: {record['output']}", flush=True)
+                    except (OSError, ValueError, KeyError, TypeError) as exc:
+                        item.update(status='failed', reason=str(exc)[:2000])
+                        log(f"Failed {url}: {exc}")
+                    args.outcomes.append(item)
+                    if args.summary:
+                        save_summary(args)
+
         finally:
             signal.signal(signal.SIGINT, previous)
             test_oc.STOP.clear()
@@ -322,10 +387,16 @@ def analyze(items, args):
         raise
 
 
+def save_summary(args, error=None):
+    write_atomic(args.summary, json.dumps({'items': args.outcomes, 'error': error}, ensure_ascii=False) + '\n')
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('links', nargs='*', help='Repository or game-directory GitHub URLs')
+    parser.add_argument('links', nargs='*', help='Public game links, including GitHub, X, and YouTube')
     parser.add_argument('--file', type=Path, help='Read additional URLs, one per line')
+    parser.add_argument('--summary', type=Path, help='Write per-input outcomes')
+    parser.add_argument('--defer-publish', action='store_true', help='Return reports for a separate trusted publisher')
     parser.add_argument('--jobs', type=int, default=3, help='Maximum concurrent agents')
     parser.add_argument('--timeout', type=float, default=900, help='Seconds per agent')
     parser.add_argument('--prompt', type=Path, default=ROOT / 'prompt.md')
@@ -335,6 +406,7 @@ def main():
     parser.add_argument('--web-base', help='Existing protected live-session URL base')
     parser.add_argument('--port', type=int, default=4096)
     args = parser.parse_args()
+    args.outcomes = []
     if args.jobs < 1 or not 0 < args.timeout < float('inf'):
         parser.error('jobs and timeout must be positive and finite')
     try:
@@ -345,20 +417,21 @@ def main():
                 fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
             except BlockingIOError:
                 raise RuntimeError('Another game catalog run is active')
-            new = [(url, directory) for url, directory in items if not (directory / 'readme.json').exists()]
-            for url, _ in items:
-                if not any(url == candidate for candidate, _ in new):
-                    print(f'Already added: {url}', flush=True)
-            if new:
+            if items:
                 executable = shutil.which(args.executable)
                 if not executable or not shutil.which('git'):
                     raise RuntimeError('Require opencode and git on PATH')
                 args.executable = str(Path(executable).resolve())
-                analyze(new, args)
-            rebuild()
+                analyze(items, args)
+            if not args.defer_publish:
+                rebuild()
+            if args.summary:
+                save_summary(args)
         return 0
     except (OSError, ValueError, RuntimeError) as exc:
         log(str(exc))
+        if args.summary:
+            save_summary(args, str(exc))
         return 1
 
 

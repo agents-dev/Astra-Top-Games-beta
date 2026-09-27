@@ -20,6 +20,8 @@ Copy every live OpenCode session URL printed by `scripts/test-oc.sh` immediately
 
 ## Wiki index
 
+- Read [Issue catalog publishing](wiki/issue-catalog.md) before changing issue publication.
+
 - Read [OpenCode batch testing](wiki/oc-batch-testing.md) before changing the batch runner.
 
 ## Verification

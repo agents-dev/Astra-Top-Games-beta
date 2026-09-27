@@ -1,0 +1,93 @@
+name: Collect games from issue links
+on:
+  issues:
+    types: [opened, edited]
+permissions: {}
+concurrency:
+  group: issue-catalog-${{ github.event.issue.number }}
+  cancel-in-progress: false
+jobs:
+  intake:
+    if: github.event.action != 'edited' || github.event.changes.body != null
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+    outputs:
+      allowed: ${{ steps.input.outputs.allowed }}
+      owner: ${{ steps.input.outputs.owner }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - id: input
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 scripts/issue_catalog.py intake
+  analyze:
+    name: Analyze games
+    needs: intake
+    if: needs.intake.outputs.allowed == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    permissions:
+      contents: read
+      actions: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Start owner SSH debugger
+        if: needs.intake.outputs.owner == 'true'
+        env:
+          AGENTSWEB_SSH_PUBLIC_KEY: ${{ secrets.AGENTSWEB_SSH_PUBLIC_KEY }}
+        run: bash scripts/issue-ssh.sh
+      - name: Install OpenCode
+        run: |
+          npm install --prefix "$RUNNER_TEMP/opencode" opencode-ai@1.18.31
+          echo "$RUNNER_TEMP/opencode/node_modules/.bin" >> "$GITHUB_PATH"
+      - name: Analyze issue links
+        timeout-minutes: 270
+        run: python3 scripts/issue_catalog.py analyze
+      - name: Upload report data
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: catalog-reports-${{ github.run_attempt }}
+          path: work/issue-catalog/result.json
+          if-no-files-found: warn
+          retention-days: 7
+      - name: Upload OpenCode records
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: catalog-records-${{ github.run_attempt }}
+          path: |
+            work/game-batches/*/records/
+            work/oc-server/server.log
+          if-no-files-found: warn
+          retention-days: 7
+      - name: Wait for publication, then hold SSH
+        if: always() && needs.intake.outputs.owner == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 scripts/issue_catalog.py hold
+  publish:
+    name: Publish catalog PR
+    needs: intake
+    if: needs.intake.outputs.allowed == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    permissions:
+      actions: read
+      contents: write
+      pull-requests: write
+      issues: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Wait for reports and publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 scripts/issue_catalog.py publish
