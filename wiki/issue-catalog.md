@@ -11,3 +11,14 @@ Start SSH only for owner issues. Wait for publication on the same analysis worke
 Configure `AGENTSWEB_SSH_PUBLIC_KEY` and permit Actions PR creation. Grant writes only to intake comments and the separate publishing job. Install OpenCode 1.18.31 for compatibility with the batch CLI. Keep each agent deadline at fifteen minutes and reserve time for publication and debugging within the hosted runner deadline. Inspect artifacts for partial results when the aggregate deadline expires.
 
 Verify changes with real issues on the designated beta repository. Check sourced additions, source-unavailable additions, replacements, rejection reports, and non-owner limits. Inspect SSH and OpenCode while analysis runs. Report the generated PR and issue-comment links as soon as they appear.
+
+## Retain the beta verification baseline
+
+Use the 2026-09-27 real OpenCode 1.18.31 run on the existing Actions SSH worker as the catalog-path baseline. Inspect `work/beta-e2e-evidence/retest-summary.json` in the implementation checkout for these observed outcomes:
+
+- Replace Arena Game in `games/B-Blarr--Arena-Game`; normalize the observed multiplayer spelling before strict validation.
+- Accept the removed `3kh0/2048` submission with an empty source field; merge its aliases with the subsequently verified `gabrielecirulli/2048` source in one existing directory.
+- Include Cyberpunk with an empty source field in the shared root catalog.
+- Reject Wikipedia as a non-game without creating a catalog page.
+
+Inspect `work/beta-e2e-evidence/initial-summary.json` for the first-run validation failures and retained original Arena report. Keep the real issue-trigger, PR/comment, owner-hold, and non-owner-limit checks pending until new beta Actions runners are approved and exercised. Do not treat the catalog CLI run as verification of GitHub orchestration.
