@@ -2,11 +2,14 @@
 
 Browse the rated games. Open each game page for evidence and play instructions.
 
-Add games with `./scripts/games.sh <github-game-url> [more-urls...]` or `./scripts/games.sh --file links.txt`. Rebuild every page and this index with `./scripts/games.sh`. Inspect `games/added.jsonl` for dated additions. Inspect `work/game-batches/` for agent logs and rejected reports.
+Add games with `./scripts/games.sh <game-url> [more-urls...]` or `./scripts/games.sh --file links.txt`. Rebuild every page and this index with `./scripts/games.sh`. Inspect `games/added.jsonl` for dated additions. Inspect `work/game-batches/` for agent logs and rejected reports.
 
 ## Games
 
+- [HELLAS · 希腊文明](games/MXMX0811--gpt-6-astra-game/civilization-v-hellas/README.md) — overall 58/100; screenshots 68/100
+- [OxCity](games/exdal--opus5.5-test/README.md) — overall 56/100; screenshots 45/100
 - [Ashlands](games/PeterBlenessy--ashlands/README.md) — overall 55/100; screenshots not scored
+- [Beat Streets — Web](games/Lewiscowles1986--beatstreets-online/README.md) — overall 53/100; screenshots 62/100
 - [Kart Royale](games/ryancampbell--kart-royale/README.md) — overall 50/100; screenshots 70/100
 - [Frosty Tactics — A Lamina Runica · The Runic Blade](games/Ninaji--Frosty-Tatics/README.md) — overall 48/100; screenshots not scored
 - [Neon Arena](games/B-Blarr--Arena-Game/README.md) — overall 48/100; screenshots not scored
@@ -17,6 +20,7 @@ Add games with `./scripts/games.sh <github-game-url> [more-urls...]` or `./scrip
 - [Turbo Kart Rally](games/bridge-mind--turbo-kart-rally/README.md) — overall 40/100; screenshots 70/100
 - [Wouf Kart](games/eddyacthergal--super-wouf-kart/README.md) — overall 38/100; screenshots not scored
 - [Taipo](games/rparrett--taipo/README.md) — overall 35/100; screenshots 55/100
+- [Trashketball — Out of Office](games/swathidbhat--gpt6-astra-ultra-codex-trashketball/README.md) — overall 34/100; screenshots not scored
 - [Flip Runner Racing](games/markcastle--fliprunner/README.md) — overall 33/100; screenshots not scored
 - [Top-10 Tension](games/cuongluu8--tenable/README.md) — overall 32/100; screenshots 32/100
 - [chess rot](games/jaimec00--chess-game/README.md) — overall 30/100; screenshots 40/100
@@ -24,6 +28,7 @@ Add games with `./scripts/games.sh <github-game-url> [more-urls...]` or `./scrip
 - [TypeScript-Blackjack](games/KSmith8888--TypeScript-Blackjack/README.md) — overall 28/100; screenshots 35/100
 - [Beachy Beachy Ball!](games/michaelkolesidis--beachy-beachy-ball/README.md) — overall 25/100; screenshots 35/100
 - [curiositY](games/sharkdp--curiosity/README.md) — overall 18/100; screenshots not scored
+- [omg-test](games/Antivortex--omg-test/README.md) — overall 10/100; screenshots not scored
 
 ## Screenshot gallery
 
@@ -34,8 +39,13 @@ Add games with `./scripts/games.sh <github-game-url> [more-urls...]` or `./scrip
 <td align="center" width="33%"><a href="games/bridge-mind--turbo-kart-rally/README.md"><img src="https://raw.githubusercontent.com/bridge-mind/turbo-kart-rally/main/docs/screenshots/race.jpg" alt="Third-person gameplay on asphalt circuit: red player kart chasing two rivals, boost pad chevrons ahead, red-white curbs, TURBO/KART/RALLY billboards, low-poly trees and mountains, HUD with LAP 1/3, timer, 8-place leaderboard, item slot, minimap, 137 km/h speedometer and 7th place." height="180"></a><br><a href="games/bridge-mind--turbo-kart-rally/README.md"><strong>Turbo Kart Rally</strong></a> · 📸 7.0/10</td>
 </tr>
 <tr>
+<td align="center" width="33%"><a href="games/MXMX0811--gpt-6-astra-game/civilization-v-hellas/README.md"><img src="https://raw.githubusercontent.com/MXMX0811/gpt-6-astra-game/main/assets/hellas-teaser.jpg" alt="Inspected 1280x720 gameplay frame: low-poly 3D hex island with grey mountains, green forests, yellow farms and cyan coast; central Athens badge with population 3; top bar with 143 gold, 4 science, 13 culture, 0 faith, 7 happiness and turn 12 in 3560 BC; left research panel for Mining and social-policy progress; scout unit card with 5 strength, 0/3 movement and 100/100 HP; right Alexander of Greece panel with city-state bonus; pixel minimap with 14 percent explored and gold END TURN button; AEGEAN SEA label over dark water. The game&#x27;s own runtime output, not concept art." height="180"></a><br><a href="games/MXMX0811--gpt-6-astra-game/civilization-v-hellas/README.md"><strong>HELLAS · 希腊文明</strong></a> · 📸 6.8/10</td>
+<td align="center" width="33%"><a href="games/Lewiscowles1986--beatstreets-online/README.md"><img src="https://raw.githubusercontent.com/Lewiscowles1986/beatstreets-online/main/e2e/reference/beatstreets-action-heropunch.png" alt="Inspected 800x480 gameplay frame: hero in white shirt and blue jeans punching an orange-jumpsuit vax enemy at the right edge of a brick street with green shutters, lamp, BOSS poster and graffiti; full arcade HUD with green health bar, heart, 0000 score and blue stamina bar. The game&#x27;s own runtime output, densest combat action of the inspected frames." height="180"></a><br><a href="games/Lewiscowles1986--beatstreets-online/README.md"><strong>Beat Streets — Web</strong></a> · 📸 6.2/10</td>
 <td align="center" width="33%"><a href="games/dgahagan--THORNMERE/README.md"><img src="https://raw.githubusercontent.com/dgahagan/THORNMERE/main/docs/screenshots/combat.png" alt="Inspected gameplay combat frame: large Fen Rat pixel portrait (grey-brown fur, red eyes, fangs) in the animated portrait window labeled FEN RAT, orders panel Round 1 for Hroth vs 4 Fen Rats and 2 Mirefangs, Attack/Defend/Cast/Use/Advance/Run buttons, six-person roster (Blade/Blade/Warden/Skald/Hexen/Lorist) with AC/HP/SP, event log with torch text. Game&#x27;s own runtime output, sharpest portrait detail." height="180"></a><br><a href="games/dgahagan--THORNMERE/README.md"><strong>THORNMERE — The Founding Song</strong></a> · 📸 6.0/10</td>
+</tr>
+<tr>
 <td align="center" width="33%"><a href="games/rparrett--taipo/README.md"><img src="https://img.itch.zone/aW1hZ2UvOTg5MTU0LzU2NjU2MDAucG5n/original/MnHlHT.png" alt="Inspected 1438x954 gameplay frame (English mode): top-down pixel-art TD board with winding gray road, red-roofed towers, skeleton/crab/snake enemies marching the dashed path, BOSS vending machine and station house decor, HUD with 20 yen coin and 0.0 timer, side action-panel prompts (engineer, solar, taut) with enemy labels (gigantic, papal, incomplete, asinine, mourner, hoglet), green range ring around a selected tower, and bottom typing buffer &#x27;&gt; engi&#x27;. Clearly the game&#x27;s own runtime output." height="180"></a><br><a href="games/rparrett--taipo/README.md"><strong>Taipo</strong></a> · 📸 5.5/10</td>
+<td align="center" width="33%"><a href="games/exdal--opus5.5-test/README.md"><img src="https://raw.githubusercontent.com/exdal/opus5.5-test/claude/ecstatic-brahmagupta-6ik44r/docs/screenshots/mp_listen_driving.png" alt="Inspected top-down gameplay: red Meridian car on road with crosswalks, pager NICE WHEELS. YOU STOLE A MERIDIAN., wanted diamonds, scoreboard ALICE/HOSTESS with 3 stars and 1300 PTS, kill feed ALICE WASTED HOSTESS, health bar, PISTOL x56, MERIDIAN 4 KM/H. Game&#x27;s own runtime output." height="180"></a><br><a href="games/exdal--opus5.5-test/README.md"><strong>OxCity</strong></a> · 📸 4.5/10</td>
 <td align="center" width="33%"><a href="games/jaimec00--chess-game/README.md"><img src="https://raw.githubusercontent.com/jaimec00/chess-game/pr-screenshots/pr-34-play.png" alt="Inspected 2800x1800 gameplay frame: starting chess position on flat blue-gray 2D board with rank/file coordinates, cburnett-style white/black pieces with drop shadows, dark glass frame, right info panel with CHESS / PLAYER VS ENGINE, White to move dot, WHITE/BLACK CAPTURES rows, NEW GAME button. Game&#x27;s own runtime output, sharpest board detail." height="180"></a><br><a href="games/jaimec00--chess-game/README.md"><strong>chess rot</strong></a> · 📸 4.0/10</td>
 </tr>
 <tr>

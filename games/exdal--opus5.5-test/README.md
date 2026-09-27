@@ -1,0 +1,108 @@
+# OxCity
+
+[Open the game source](https://github.com/exdal/opus5.5-test)
+
+**Overall rating:** 56/100. Far from AAA (no campaign, cinematics, voice, matchmaking or public playable build; flat procedural art; source build with xmake/clang/Vulkan only; playability, balance and performance not proven by stills). Against the catalog it is the strongest verified real-time 3D open-world package: most relevant comparators are Ashlands (55 overall, broader RPG scope but zero inspectable screenshots), Kart Royale (50 overall, polished single-track kart loop with 70 screenshot score) and Neon Arena (48 overall, broad systems but no inspectable pixels). OxCity exceeds Kart on scope (open city, on-foot plus driving, crime/police/heist, 4-player online vs one 1.6km track) and Neon Arena on verifiability (six inspected runtime frames), and matches Ashlands on technical depth (Jolt vehicles, 30Hz snapshots, validation, headless autoplay/net-test checklists) with actual gameplay pixels. It trails Kart on visual polish and pick-up-and-play accessibility. Hence new catalog top at 56, capped by simple art, build-only distribution and unverified feel.
+
+**Screenshot score:** 45/100. Six inspected runtime frames show coherent low-poly top-down city with roads, sidewalks, buildings, cars, peds, blood, HUD and menus. Readable and consistent but flat-shaded, sparse detail, simple lighting next to catalog 70s (Kart Royale, Turbo Kart Rally, Neural Sight with dense 3D, crowds, lighting) and below THORNMERE (60, textured viewport plus portraits) and Taipo (55, denser pixel board). Above neverquest (30), Blackjack/Beachy (35) and chess rot (40) flat DOM/text looks. Menu discounted. Judged from stills only, no motion inferred.
+
+## Screenshots
+
+![Inspected top-down gameplay: red Meridian car on road with crosswalks, pager NICE WHEELS. YOU STOLE A MERIDIAN., wanted diamonds, scoreboard ALICE/HOSTESS with 3 stars and 1300 PTS, kill feed ALICE WASTED HOSTESS, health bar, PISTOL x56, MERIDIAN 4 KM/H. Game's own runtime output.](https://raw.githubusercontent.com/exdal/opus5.5-test/claude/ecstatic-brahmagupta-6ik44r/docs/screenshots/mp_listen_driving.png)
+
+Inspected top-down gameplay: red Meridian car on road with crosswalks, pager NICE WHEELS. YOU STOLE A MERIDIAN., wanted diamonds, scoreboard ALICE/HOSTESS with 3 stars and 1300 PTS, kill feed ALICE WASTED HOSTESS, health bar, PISTOL x56, MERIDIAN 4 KM/H. Game's own runtime output.
+
+![Inspected top-down gameplay: city street with buildings and sidewalk, 2X COMBO +200 overlay, pager YOU WASTED BOB. +1000 PTS, kill feed ALICE JOINED / ALICE WASTED BOB, scoreboard ALICE 1300 vs BOB 0, health bar, PISTOL x55. Game's own runtime output.](https://raw.githubusercontent.com/exdal/opus5.5-test/claude/ecstatic-brahmagupta-6ik44r/docs/screenshots/mp_shooter_wasted_them.png)
+
+Inspected top-down gameplay: city street with buildings and sidewalk, 2X COMBO +200 overlay, pager YOU WASTED BOB. +1000 PTS, kill feed ALICE JOINED / ALICE WASTED BOB, scoreboard ALICE 1300 vs BOB 0, health bar, PISTOL x55. Game's own runtime output.
+
+![Inspected top-down gameplay after respawn: pager PATCHED UP AND BACK ON THE STREET., kill feed, scoreboard ALICE 1300 vs BOB 0, red blood pool decal on road, small red player figure, buildings with lit windows, PISTOL x60. Game's own runtime output.](https://raw.githubusercontent.com/exdal/opus5.5-test/claude/ecstatic-brahmagupta-6ik44r/docs/screenshots/mp_target_respawned.png)
+
+Inspected top-down gameplay after respawn: pager PATCHED UP AND BACK ON THE STREET., kill feed, scoreboard ALICE 1300 vs BOB 0, red blood pool decal on road, small red player figure, buildings with lit windows, PISTOL x60. Game's own runtime output.
+
+![Inspected top-down gameplay death screen: large FLATLINED / WASTED BY ALICE. DROPPED $0 overlay over street with buildings, kill feed, health bar empty, PISTOL x60. Game's own runtime output.](https://raw.githubusercontent.com/exdal/opus5.5-test/claude/ecstatic-brahmagupta-6ik44r/docs/screenshots/mp_target_wasted.png)
+
+Inspected top-down gameplay death screen: large FLATLINED / WASTED BY ALICE. DROPPED $0 overlay over street with buildings, kill feed, health bar empty, PISTOL x60. Game's own runtime output.
+
+![Inspected top-down gameplay validation frame: rooftops with vents, road with lane markings, small player figure, pager WELCOME TO OXCITY. THE BANK ON THE NORTH SIDE IS RIPE., health bar, PISTOL x60, clean road with no ghost shadow after VSM fix. Game's own runtime output.](https://raw.githubusercontent.com/exdal/opus5.5-test/claude/ecstatic-brahmagupta-6ik44r/docs/screenshots/vsm_ghost_shadow_patched.png)
+
+Inspected top-down gameplay validation frame: rooftops with vents, road with lane markings, small player figure, pager WELCOME TO OXCITY. THE BANK ON THE NORTH SIDE IS RIPE., health bar, PISTOL x60, clean road with no ghost shadow after VSM fix. Game's own runtime output.
+
+![Inspected title/menu screen: OXCITY logo over blurred city, MULTIPLAYER panel with NAME ALICE and HOST 192.168.1.20:7777 fields, JOIN/HOST/BACK buttons. Menu, not active gameplay; discounted for graphics scoring.](https://raw.githubusercontent.com/exdal/opus5.5-test/claude/ecstatic-brahmagupta-6ik44r/docs/screenshots/mp_menu.png)
+
+Inspected title/menu screen: OXCITY logo over blurred city, MULTIPLAYER panel with NAME ALICE and HOST 192.168.1.20:7777 fields, JOIN/HOST/BACK buttons. Menu, not active gameplay; discounted for graphics scoring.
+
+## Play
+
+- Build on Linux with xmake, clang/libc++ 23 and Vulkan SDK, then run OxCity (see repo README Building section).
+- On foot move with WASD/arrows, sprint Shift, attack Ctrl/LMB, switch weapon Q, rob/hold E, horn H in car, handbrake Space, pause Esc.
+- Press F/Enter to enter a parked car, steal it, or carjack a driver; drive with WASD/arrows.
+- Mug pedestrians with E, shoot with mouse-aimed pistol, evade or fight police as wanted diamonds rise.
+- Stand on the bank green marker and hold E for 8 seconds to rob $6,000-$12,000 while guards attack.
+- For multiplayer: MULTIPLAYER menu, enter name, HOST GAME or JOIN by host:port (UDP 7777), or run OxCity --server / --host / --join.
+
+## Mechanics
+
+- Procedural 16x16-tile open city with road-graph traffic AI and sidewalk pedestrians that flee violence
+- On-foot Jolt character controller with fists, mouse-aimed pistol, and hold-E mugging
+- Five Jolt wheeled vehicles with steal, carjack, handbrake and distinct handling
+- 0-5 diamond wanted level with police-car chase, ramming, foot cops, shooting from 3 stars, arrest and hospital respawn
+- 8-second bank heist with alarm, guards and $6,000-$12,000 payout
+- Up to 4-player ENet free-for-all with listen/dedicated server, snapshots, kill feed, scoreboard and cash drops
+- RmlUi HUD/menus bound to one data model, particles/blood/explosions, procedural models and synthesized sounds
+
+## Tags
+
+- top-down
+- open-world
+- crime
+- gta-like
+- driving
+- shooter
+- low-poly
+- procedural-generation
+- multiplayer
+- pvp
+- online-multiplayer
+- cpp
+
+## Controls
+
+- Mobile controls: Not established
+- Motion controls: Not established
+- Gamepad: Not established
+- Keyboard/mouse: Supported
+
+## Player modes
+
+- Human players: 1-4
+- Modes: single-player, online multiplayer
+
+## Reconstructed prompt
+
+Build OxCity, a top-down open-city crime game in C++23 on the Oxylus engine with Jolt physics: procedural 16x16 city, on-foot pistol/mugging, five drivable carjackable cars, road-graph traffic and fleeing peds, 0-5 wanted level with chasing/shooting cops, bank heist, RmlUi HUD/menus, procedural models plus synthesized sounds, particles/blood, and up to 4-player ENet free-for-all with listen/dedicated server, with headless autoplay and net-test verification.
+
+## Source evidence
+
+- Repo is OxCity: a top-down open-city crime game built on the Oxylus engine as an engine field test; wake up outside hospital, steal cars, mug, rob north-side bank, lose cops. ([source](https://github.com/exdal/opus5.5-test))
+- Game scope: procedural 16x16 city, Jolt on-foot controller with fists/pistol/mugging, five Jolt wheeled cars with steal/carjack, graph traffic and fleeing peds, 0-5 diamond wanted level with chase/ram/shoot/arrest, 8-second $6k-$12k bank heist, RmlUi HUD/menus, procedural models and synthesized sounds. ([source](https://github.com/exdal/opus5.5-test/blob/claude/ecstatic-brahmagupta-6ik44r/README.md))
+- Controls are WASD/arrows move/drive, Shift sprint, Space handbrake, F/Enter enter/exit, Ctrl/LMB attack, Q weapon, E rob, H horn, Esc pause; mouse aiming via camera screen ray. ([source](https://github.com/exdal/opus5.5-test/blob/claude/ecstatic-brahmagupta-6ik44r/README.md))
+- Multiplayer is up to 4-player free-for-all over ENet: menu HOST/JOIN, default UDP 7777, CLI --host/--join/--server dedicated, per-player wanted/cash/score, kill feed/scoreboard/name tags, 30Hz ~1.2KB snapshots. ([source](https://github.com/exdal/opus5.5-test/blob/claude/ecstatic-brahmagupta-6ik44r/README.md))
+- Building requires Linux xmake/clang 23/Vulkan SDK (xmake b OxCity, xmake r OxCity); headless autoplay and net-test scripts only; no browser play or binary release found, so no playable URL. ([source](https://github.com/exdal/opus5.5-test/blob/claude/ecstatic-brahmagupta-6ik44r/README.md))
+- Devlog documents validation, VSM/material fixes, particles, mouse aiming, sound retune and multiplayer design with headless PASS/FAIL checklists and screenshot captures. ([source](https://github.com/exdal/opus5.5-test/blob/claude/ecstatic-brahmagupta-6ik44r/docs/DEVLOG.md))
+- Screenshots folder holds inspected multiplayer and VSM gameplay frames; README driving image docs/screenshots/03\_driving.png returns 404. ([source](https://github.com/exdal/opus5.5-test/tree/claude/ecstatic-brahmagupta-6ik44r/docs/screenshots))
+
+## Fictional reviews
+
+Treat these as illustrative, not real user reviews.
+
+- 78/100: Fictional illustrative review one: stole a Meridian, outran two stars, drilled the bank while guards closed in and escaped with six grand. For a source-built toy it feels shockingly GTA-shaped.
+- 58/100: Fictional illustrative review two: clever netcode and real Jolt driving, but the flat top-down blocks get samey fast and I had to build it myself with xmake and Vulkan. Great tech demo, needs content and an actual download.
+- 95/100: Fictional illustrative review three: host-simulated snapshots at 30Hz, client-side feet, kill feed and name tags over a procedural wanted-level city? As an engine field test with headless autoplay checklists this is the most technically serious game in the catalog.
+
+## Links
+
+- [https://github.com/exdal/opus5.5-test](https://github.com/exdal/opus5.5-test)
+- [https://github.com/exdal/opus5.5-test/blob/claude/ecstatic-brahmagupta-6ik44r/README.md](https://github.com/exdal/opus5.5-test/blob/claude/ecstatic-brahmagupta-6ik44r/README.md)
+- [https://github.com/exdal/opus5.5-test/blob/claude/ecstatic-brahmagupta-6ik44r/docs/DEVLOG.md](https://github.com/exdal/opus5.5-test/blob/claude/ecstatic-brahmagupta-6ik44r/docs/DEVLOG.md)
+- [https://github.com/oxylusengine/Oxylus](https://github.com/oxylusengine/Oxylus)
