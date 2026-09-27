@@ -104,6 +104,9 @@ def publish_report(data, submitted, metadata=None):
     if any(p.is_symlink() for p in [directory, *directory.parents]):
         raise ValueError('Refuse symlink catalog destination')
     status = 'replaced' if (directory / 'readme.json').exists() else 'added'
+    if status == 'replaced':
+        previous = json.loads((directory / 'readme.json').read_text())
+        data['links'] = list(dict.fromkeys(data['links'] + [u for u in previous.get('links', []) if safe_url(u)]))
     rendered = game_readme(data)
     write_atomic(directory / 'readme.json', json.dumps(data, indent=2, ensure_ascii=False) + '\n')
     write_atomic(directory / 'README.md', rendered)
